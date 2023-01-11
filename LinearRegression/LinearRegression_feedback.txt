@@ -1,0 +1,33 @@
+11/12/22 21:21
+
+Problem 1 (3 points):
+Score += 3
+
+Problem 2 (8 points):
+Score += 8
+
+Problem 3 (3 points):
+Score += 3
+
+Problem 4 (8 points):
+Score += 8
+
+Problem 5 (5 points):
+Only time the training of the statsmodels model, not iterating through all combinations (is not comparable to other models). Times also should be nonzero. (The most common cause of this is if you're using Windows, time.time() is not very accurate for time frames of <0.1s, so use time.perf_counter() instead)
+Score += 3
+
+Problem 6 (9 points):
+Score += 9
+
+Problem 7 (9 points):
+Score += 9
+
+Code Quality (5 points):
+Score += 5
+
+Total score: 48/50 = 96.0%
+
+Great job!
+
+-------------------------------------------------------------------------------
+
