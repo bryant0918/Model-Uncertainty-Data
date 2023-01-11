@@ -1,0 +1,29 @@
+10/25/22 16:58
+
+Problem 1 (5 points):
+Score += 5
+
+Problem 2 (10 points):
+No labels on plots
+Score += 9
+
+Problem 3 (10 points):
+No descriptive label on plot
+Score += 9
+
+Problem 4 (10 points):
+Score += 10
+
+Problem 5 (10 points):
+The plot and the colorbar are using different colormaps
+Score += 9
+
+Code Quality (5 points):
+Score += 5
+
+Total score: 47/50 = 94.0%
+
+Great job!
+
+-------------------------------------------------------------------------------
+
