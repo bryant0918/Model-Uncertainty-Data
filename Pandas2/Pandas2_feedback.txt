@@ -1,0 +1,24 @@
+09/19/22 15:36
+
+Problem 1 (10 points):
+Score += 10
+
+Problem 2 (10 points):
+Score += 10
+
+Problem 3 (10 points):
+Score += 10
+
+Problem 4 (15 points):
+(-2) Avoid plotting things with different units together, especially in boxplots; note that the Top25Perc variable is a proportion of students, while the other plotted variables are raw counts. (-3) Unclear variable names in labels
+Score += 10
+
+Code Quality (5 points):
+Score += 5
+
+Total score: 45/50 = 90.0%
+
+Great job!
+
+-------------------------------------------------------------------------------
+
