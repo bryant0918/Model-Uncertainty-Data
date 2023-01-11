@@ -1,0 +1,82 @@
+12/07/22 15:18
+
+Problem 1 (5 points):
+Columns of DataFrame not correct.
+Extra words:
+	"<UNK>"
+
+Score += 0
+
+Problem 2 (5 points):
+Score += 5
+
+Problem 3 (5 points):
+Score += 5
+
+Problem 4 (5 points):
+Incorrect probabilities
+	Correct response: [[-150.89  -117.429]
+ [-156.284 -172.203]
+ [-146.845 -158.555]
+ [ -61.72   -70.365]
+ [ -29.875  -35.725]
+ [-121.169 -125.554]
+ [-140.16  -145.172]
+ [ -53.839  -54.567]
+ [-149.769 -161.321]
+ [ -56.875  -65.636]]
+	Student response: [[-176.341 -139.131]
+ [-164.771 -179.445]
+ [-163.814 -173.028]
+ [ -61.721  -70.369]
+ [ -29.875  -35.726]
+ [-146.621 -147.257]
+ [-165.612 -166.875]
+ [ -62.323  -61.802]
+ [-183.704 -190.257]
+ [ -56.876  -65.639]]
+Incorrect classifications
+	Correct response: "['spam' 'ham' 'ham' 'ham' 'ham' 'ham' 'ham' 'ham' 'ham' 'ham']"
+	Student response: "['spam' 'ham' 'ham' 'ham' 'ham' 'ham' 'ham' 'spam' 'ham' 'ham']"
+Score += 0
+
+Problem 5 (10 points):
+Score += 10
+
+Problem 6 (10 points):
+Incorrect probabilities
+	Correct response: [[-93.233 -61.001]
+ [-70.039 -84.716]
+ [-70.923 -81.013]
+ [-39.422 -47.556]
+ [-22.029 -27.768]
+ [-58.451 -62.347]
+ [-77.694 -82.457]
+ [-36.716 -37.533]
+ [-72.455 -81.837]
+ [-34.611 -43.286]]
+	Student response: [[   -inf    -inf]
+ [-65.313    -inf]
+ [-65.401    -inf]
+ [-23.635    -inf]
+ [-12.033    -inf]
+ [   -inf    -inf]
+ [-59.775    -inf]
+ [   -inf    -inf]
+ [-75.462    -inf]
+ [-18.595    -inf]]
+Incorrect classifications
+	Correct response: "['spam' 'ham' 'ham' 'ham' 'ham' 'ham' 'ham' 'ham' 'ham' 'ham']"
+	Student response: "['ham' 'ham' 'ham' 'ham' 'ham' 'ham' 'ham' 'ham' 'ham' 'ham']"
+Score += 0
+
+Problem 7 (5 points):
+Score += 5
+
+Code Quality (5 points):
+Score += 5
+
+Total score: 30/50 = 60.0%
+
+-------------------------------------------------------------------------------
+
