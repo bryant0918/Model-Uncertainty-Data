@@ -24,20 +24,23 @@ def word_count(filename='huck_finn.txt'):
     Returns:
         word_counts (list): list of (word, count) pairs for the 20 most used words
     """
+    # Start my session and open the file
     spark = SparkSession.builder.appName("app_name").getOrCreate()
     words = spark.sparkContext.textFile(filename)
+
+    # Flatten the words and make a dictionary
     words = words.flatMap(lambda row: row.split())
-
     diction = words.map(lambda word: (word, 1))
-    counts = diction.reduceByKey(lambda x, y: x + y)
 
+    # Count words and sort them
+    counts = diction.reduceByKey(lambda x, y: x + y)
     sorted = counts.sortBy(lambda row: row[1], ascending=False).take(20)
     spark.stop()
 
     return sorted
 
 
-print(word_count())
+# print(word_count())
 
 
 ### Problem 2
@@ -50,13 +53,16 @@ def monte_carlo(n=10 ** 5, parts=6):
     Returns:
         pi_est (float): estimated value of pi
     """
+    # Start spark session and paralellize
     spark = SparkSession.builder.appName("app_name").getOrCreate()
     x = spark.sparkContext.parallelize(np.random.uniform(-1, 1, (n * parts, 2)), parts)
 
+    # Filter and count
     number = x.filter(lambda row: la.norm(row, axis=0) <= 1).count()
 
     spark.stop()
 
+    # Return approximation
     return 4 * number / (n * parts)
 
 
@@ -74,13 +80,18 @@ def titanic_df(filename='titanic.csv'):
              the survival rate of women,
              and the survival rate of men in that order.
     """
+    # Start spark session
     spark = SparkSession.builder.appName("app_name").getOrCreate()
 
+    # Define schema and read in file
     schema = ('survived INT, pclass INT, name STRING, sex STRING, age FLOAT, sibsp INT, parch INT, fare FLOAT')
-    titanic = spark.read.csv('titanic.csv', schema=schema)
+    titanic = spark.read.csv(filename, schema=schema)
+
+    # Filter by sex
     females = titanic.filter(titanic.sex == "female")
     males = titanic.filter(titanic.sex == "male")
 
+    # Filter by survived
     survived_males = males.filter(males.survived == 1)
     survived_females = females.filter(females.survived == 1)
 
@@ -104,15 +115,19 @@ def crime_and_income(crimefile='london_crime_by_lsoa.csv',
     returns:
         numpy array: borough names sorted by percent months with crime, descending
     """
+    # Start Session and load in files
     spark = SparkSession.builder.appName("app_name").getOrCreate()
-    crime = spark.read.csv('london_crime_by_lsoa.csv', header=True, inferSchema=True)
-    income = spark.read.csv('london_income_by_borough.csv', header=True, inferSchema=True)
+    crime = spark.read.csv(crimefile, header=True, inferSchema=True)
+    income = spark.read.csv(incomefile, header=True, inferSchema=True)
 
+    # Get crimes by borough
     crimes_by_borough = crime.filter(crime.major_category == major_cat).groupBy("borough").sum('value')
 
+    # Join the tables and select columns
     joined = crimes_by_borough.join(income, on="borough").sort('sum(value)', ascending=False)
     df = joined.select(['borough', 'sum(value)', 'median-08-16']).collect()
 
+    # Cast as array to plot
     df = np.array(df)
     plt.scatter(df[:, 1].astype(int), df[:, 2].astype(float))
     plt.xlabel("Crimes")
@@ -137,10 +152,14 @@ def titanic_classifier(filename='titanic.csv'):
         metrics (tuple): a tuple of metrics gauging the performance of the model
             ('accuracy', 'weightedRecall', 'weightedPrecision')
     """
+    # Start Spark Session
     spark = SparkSession.builder.appName("app_name").getOrCreate()
-    schema = ('survived INT, pclass INT, name STRING, sex STRING, age FLOAT, sibsp INT, parch INT, fare FLOAT')
-    titanic = spark.read.csv('titanic.csv', schema=schema)
 
+    # Define schema and read in file
+    schema = ('survived INT, pclass INT, name STRING, sex STRING, age FLOAT, sibsp INT, parch INT, fare FLOAT')
+    titanic = spark.read.csv(filename, schema=schema)
+
+    # Code in the lab file
     sex_binary = StringIndexer(inputCol='sex', outputCol='sex_binary')
     onehot = OneHotEncoder(inputCols=['pclass'], outputCols=['pclass_onehot'])
 
@@ -152,21 +171,25 @@ def titanic_classifier(filename='titanic.csv'):
     titanic = titanic.drop('pclass', 'name', 'sex')
     train, test = titanic.randomSplit([0.75, 0.25], seed=11)
 
+    # Use random forest instead of LogReg
     rf = RandomForestClassifier(labelCol='survived', featuresCol='features')
 
+    # change my estimator paramMaps
     tvs = TrainValidationSplit(estimator=rf,
                                estimatorParamMaps=[{rf.maxDepth: 3}, {rf.minInstancesPerNode: 3}],
                                evaluator=MCE(labelCol='survived'),
                                trainRatio=0.75, seed=11)
 
+    # Train model
     clf = tvs.fit(train)
+
+    # Get results
     results = clf.bestModel.evaluate(test)
-    print(results.accuracy)
-    print(results.weightedRecall)
-    print(results.weightedPrecision)
+    answer = (results.accuracy, results.weightedRecall, results.weightedPrecision)
+    spark.stop()
 
-    return results.accuracy, results.weightedRecall, results.weightedPrecision
+    return answer
 
 
-titanic_classifier()
+# titanic_classifier()
 

@@ -1,8 +1,14 @@
 """Volume 3: Web Scraping.
-<Name>
-<Class>
-<Date>
+Bryant McArthur
+Math 405
+January 17, 2023
 """
+
+import requests
+from bs4 import BeautifulSoup
+from os import path
+from matplotlib import pyplot as plt
+
 
 # Problem 1
 def prob1():
@@ -11,8 +17,16 @@ def prob1():
     Save the source as a file called example.html.
     If the file already exists, do not scrape the website or overwrite the file.
     """
-    raise NotImplementedError("Problem 1 Incomplete")
-    
+
+    # Check if path exists
+    if not path.exists("example.html"):
+        # Scrape site and save file
+        response = requests.get("http://www.example.com")
+        with open("example.html", 'w') as f:
+            f.write(response.text)
+    pass
+
+
 # Problem 2
 def prob2(code):
     """Return a list of the names of the tags in the given HTML code.
@@ -20,7 +34,16 @@ def prob2(code):
         code (str): A string of html code
     Returns:
         (list): Names of all tags in the given code"""
-    raise NotImplementedError("Problem 2 Incomplete")
+    # parse and get tags
+    soup = BeautifulSoup(code, 'html.parser')
+    tags = soup.find_all(True)
+
+    # Iterate through tags and append names
+    names = []
+    for tag in tags:
+        names.append(tag.name)
+
+    return names
 
 
 # Problem 3
@@ -34,7 +57,18 @@ def prob3(filename="example.html"):
         (str): text of first <a> tag
         (bool): whether or not the tag has an 'href' attribute
     """
-    raise NotImplementedError("Problem 3 Incomplete")
+    # Open file and parse
+    with open(filename, 'r') as f:
+        data = f.read()
+    soup = BeautifulSoup(data, 'html.parser')
+
+    # Get first a tag
+    a_tag = soup.a
+
+    # Check if it has href attribute
+    my_bool = hasattr(a_tag, 'href')
+
+    return a_tag.text, my_bool
 
 
 # Problem 4
@@ -50,7 +84,18 @@ def prob4(filename="san_diego_weather.html"):
     Returns:
         (list) A list of bs4.element.Tag objects (NOT text).
     """
-    raise NotImplementedError("Problem 4 Incomplete")
+    # Open file and parse
+    with open(filename, 'r') as f:
+        data = f.read()
+    soup = BeautifulSoup(data, 'html.parser')
+
+    # Find tags
+    one = soup.find(string="Thursday, January 1, 2015").parent
+    twoa = soup.find_all(class_="previous-link")[0]
+    twob = soup.find_all(class_="next-link")[0]
+    three = soup.find(string="Max Temperature").parent.parent.next_sibling.next_sibling.span.span
+
+    return [one, twoa, twob, three]
 
 
 # Problem 5
@@ -62,7 +107,31 @@ def prob5(filename="large_banks_index.html"):
     Returns:
         (list): A list of bs4.element.Tag objects (NOT text).
     """
-    raise NotImplementedError("Problem 5 Incomplete")
+    # Open file and parse
+    with open(filename, 'r') as f:
+        data = f.read()
+    soup = BeautifulSoup(data, 'html.parser')
+
+    # Find all tags
+    tags = soup.find_all(name='a')
+
+    # Define first and last tags
+    first = soup.find(string="December 31, 2014").parent
+    last = soup.find(string="September 30, 2003").parent
+
+    # Iterate through appropriate tags and save
+    append = False
+    mylist = []
+    for tag in tags:
+        if tag == first:
+            append = True
+        if append:
+            if hasattr(tag, 'href'):
+                mylist.append(tag)
+        if tag == last:
+            break
+
+    return mylist
 
 
 # Problem 6
@@ -75,4 +144,45 @@ def prob6(filename="large_banks_data.html"):
 
     In the case of a tie, sort the banks alphabetically by name.
     """
-    raise NotImplementedError("Problem 6 Incomplete")
+    # Open file and parse
+    with open(filename, 'r') as f:
+        data = f.read()
+    soup = BeautifulSoup(data, 'html.parser')
+
+    # Iterate through tables and get appropriate rows
+    bank_tags = [tag.td.text[:tag.td.text.find("/")] for tag in soup.find_all(name='tr', attrs={"valign": "TOP"})][1:]
+    bank_ids = [tag.td.next_sibling.next_sibling.next_sibling.next_sibling.text
+                for tag in soup.find_all(name='tr', attrs={"valign": "TOP"})][1:]
+    domestic_branches = [tag.td.next_sibling.next_sibling.next_sibling.next_sibling.next_sibling.next_sibling.next_sibling.next_sibling.next_sibling.next_sibling.next_sibling.next_sibling.next_sibling.next_sibling.next_sibling.next_sibling.next_sibling.next_sibling.text
+                         for tag in soup.find_all(name='tr', attrs={"valign": "TOP"})][1:]
+    foreign_branches = [tag.td.next_sibling.next_sibling.next_sibling.next_sibling.next_sibling.next_sibling.next_sibling.next_sibling.next_sibling.next_sibling.next_sibling.next_sibling.next_sibling.next_sibling.next_sibling.next_sibling.next_sibling.next_sibling.next_sibling.next_sibling.text
+                         for tag in soup.find_all(name='tr', attrs={"valign": "TOP"})][1:]
+
+    # Change bad values to 0
+    for i, bank in enumerate(domestic_branches):
+        if bank == ".":
+            domestic_branches[i] = "0"
+            foreign_branches[i] = "0"
+
+    # Create appropriate dictionaries
+    domestic_banks = {(bank, bank_ids[i]): float(domestic_branches[i].replace(",", "")) for i, bank in enumerate(bank_tags)}
+    foreign_banks = {(bank, bank_ids[i]): float(foreign_branches[i].replace(",", "")) for i, bank in enumerate(bank_tags)}
+
+    # Sort
+    sorted_domestic = sorted(domestic_banks.items(), key=lambda item: item[1], reverse=True)
+    sorted_foreign = sorted(foreign_banks.items(), key=lambda item: item[1], reverse=True)
+
+    # First Plot
+    fig, axes = plt.subplots(nrows = 2, ncols = 1)
+    axes[0].barh([x[0][0] for x in sorted_domestic[:7]], [x[1] for x in sorted_domestic[:7]])
+
+    # Second Plot
+    axes[1].barh([x[0][0] for x in sorted_foreign[:7]], [x[1] for x in sorted_foreign[:7]])
+    plt.title("Foreign Branches")
+    plt.suptitle("Banks with Most Domestic Branches")
+    plt.tight_layout()
+    plt.show()
+
+
+if __name__ == "__main__":
+    print(prob4())

@@ -1,6 +1,6 @@
-# Name
-# Date
-# Class
+# Bryant McArthur
+# March 7, 2023
+# Math 405
 
 from scipy.stats.distributions import norm
 from scipy.optimize import minimize
@@ -63,6 +63,7 @@ def state_space_rep(phis, thetas, mu, std):
 
 ##############################################################################
 
+
 def arma_forecast_naive(filename='weather.npy', p=2, q=1, n=20):
     """
     Perform ARMA(1,1) on data. Let error terms be drawn from
@@ -75,7 +76,31 @@ def arma_forecast_naive(filename='weather.npy', p=2, q=1, n=20):
         q (int): order of moving average model
         n (int): number of future predictions
     """
-    raise NotImplementedError("Problem 1 Incomplete")
+    data = np.load(filename)
+    Z = list(data)
+    k = len(Z)
+
+    phi, theta = .5, .1
+    c, sigma = 0, 1
+
+    eps = list(np.random.normal(0, sigma, k))
+
+    for t in range(k, k+n):
+        eps.append(np.random.normal(0, sigma))
+        AR = np.sum([phi*Z[t-i] for i in range(1, p)])
+        MA = np.sum([theta*eps[t-j] for j in range(1, q)])
+
+        Zt = c + AR + MA + eps[t]
+        Z.append(Zt)
+
+    plt.plot(np.diff(data), label="Old Data")
+    plt.plot([x for x in range(k, k+n-1)], np.diff(Z[k:]), label="New Data")
+    plt.title("ARMA(2,1) Naive Forecast")
+    plt.legend()
+    plt.show()
+
+    return Z
+
 
 def arma_likelihood(filename='weather.npy', phis=np.array([0.9]), thetas=np.array([0]), mu=17., std=0.4):
     """
@@ -92,7 +117,10 @@ def arma_likelihood(filename='weather.npy', phis=np.array([0.9]), thetas=np.arra
     Return:
         log_likelihood (float)
     """
-    raise NotImplementedError("Problem 2 Incomplete")
+    data = np.load(filename)
+
+
+
 
 def model_identification(filename='weather.npy', p_max=4, q_max=4):
     """
@@ -182,3 +210,9 @@ def manaus(start='1983-01-31', end='1995-01-31', i=4, j=4):
     manaus.columns = ['Water Level']
 
     raise NotImplementedError("Problem 7 Incomplete")
+
+
+if __name__ == "__main__":
+    predictions = arma_forecast_naive(filename="weather.npy", p=2, q=1, n=20)
+
+    pass
